@@ -1,0 +1,82 @@
+{
+  "_comment": "Pterodactyl v2 Egg for s&box Dedicated Server (Steam App 1892930). IMPORTANT: The hypervisor/VM running Pterodactyl Wings MUST expose x86-64-v3 (SSE4.2 + AVX2) CPU flags (e.g. Proxmox CPU type 'host'). Default 'kvm64' fails with SIGILL (exit code 132).",
+  "meta": {
+    "version": "PTDL_v2",
+    "update_url": null
+  },
+  "exported_at": "2026-11-17T12:00:00+00:00",
+  "name": "s&box Dedicated Server",
+  "author": "info@sboxlist.com",
+  "description": "s&box Dedicated Server (Steam App 1892930) with Steam SDK64 setup, disk-backed TMPDIR, 'game.load success' startup detection, and clean SIGINT (^C) shutdown. Requires x86-64-v3 / AVX2 CPU flags on the Wings host.",
+  "features": [],
+  "docker_images": {
+    "Source Runtime": "ghcr.io/pterodactyl/games:source"
+  },
+  "file_denylist": [],
+  "startup": "env HOME=/home/container TMPDIR=/home/container/.tmp TERM=xterm LD_LIBRARY_PATH=/home/container/bin/linuxsteamrt64:/home/container/linux64:/home/container ./sbox-server +game {{GAME_PACKAGE}} {{MAP_PACKAGE}} +port {{SERVER_PORT}} +net_query_port {{QUERY_PORT}} +hostname \\\"{{HOSTNAME}}\\\" +net_game_server_token \\\"{{SBOX_SERVER_TOKEN}}\\\"",
+  "config": {
+    "files": "{}",
+    "startup": "{\r\n    \"done\": \"game.load success\"\r\n}",
+    "logs": "{}",
+    "stop": "^C"
+  },
+  "scripts": {
+    "installation": {
+      "script": "#!/bin/bash\nset -e\napt-get update\napt-get install -y lib32gcc-s1 curl tar ca-certificates\nmkdir -p /mnt/server/steamcmd /mnt/server/steamapps /mnt/server/.tmp\nexport HOME=/mnt/server\nexport TMPDIR=/mnt/server/.tmp\ncurl -sSL -o /mnt/server/.tmp/steamcmd.tar.gz https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz\ntar -xzf /mnt/server/.tmp/steamcmd.tar.gz -C /mnt/server/steamcmd\nrm -f /mnt/server/.tmp/steamcmd.tar.gz\ncd /mnt/server/steamcmd\n./steamcmd.sh +force_install_dir /mnt/server +login anonymous +app_update 1892930 validate +quit\nmkdir -p /mnt/server/.steam/sdk64 /mnt/server/.steam/sdk32\ncp -f /mnt/server/steamcmd/linux64/steamclient.so /mnt/server/.steam/sdk64/steamclient.so\ncp -f /mnt/server/steamcmd/linux32/steamclient.so /mnt/server/.steam/sdk32/steamclient.so\nchmod +x /mnt/server/sbox-server\nrm -rf /mnt/server/.tmp/*\n",
+      "container": "ghcr.io/pterodactyl/installers:debian",
+      "entrypoint": "bash"
+    }
+  },
+  "variables": [
+    {
+      "name": "Game Package or .sbproj",
+      "description": "Package ident (e.g. facepunch.sandbox) or path to a local .sbproj.",
+      "env_variable": "GAME_PACKAGE",
+      "default_value": "facepunch.sandbox",
+      "user_viewable": true,
+      "user_editable": true,
+      "rules": "required|string|max:200",
+      "field_type": "text"
+    },
+    {
+      "name": "Map Package",
+      "description": "Optional map package (e.g. facepunch.flatgrass). Leave blank when loading a project with its own StartupScene.",
+      "env_variable": "MAP_PACKAGE",
+      "default_value": "facepunch.flatgrass",
+      "user_viewable": true,
+      "user_editable": true,
+      "rules": "nullable|string|max:100",
+      "field_type": "text"
+    },
+    {
+      "name": "Server Hostname",
+      "description": "Public server name shown in the server browser.",
+      "env_variable": "HOSTNAME",
+      "default_value": "s&box Dedicated Server",
+      "user_viewable": true,
+      "user_editable": true,
+      "rules": "required|string|max:100",
+      "field_type": "text"
+    },
+    {
+      "name": "Query Port",
+      "description": "UDP query port (+net_query_port, engine default 27016). Assign a second port allocation on the server.",
+      "env_variable": "QUERY_PORT",
+      "default_value": "27016",
+      "user_viewable": true,
+      "user_editable": true,
+      "rules": "required|numeric",
+      "field_type": "text"
+    },
+    {
+      "name": "Steam Game Server Login Token (GSLT)",
+      "description": "Optional Steam Game Server Token (+net_game_server_token) from steamcommunity.com/dev/managegameservers for public Steam master list visibility.",
+      "env_variable": "SBOX_SERVER_TOKEN",
+      "default_value": "",
+      "user_viewable": true,
+      "user_editable": true,
+      "rules": "nullable|string|max:64",
+      "field_type": "text"
+    }
+  ]
+}

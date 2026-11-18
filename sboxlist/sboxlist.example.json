@@ -1,0 +1,13 @@
+{
+  "sites": [
+    {
+      "siteId": "sboxlist.com",
+      "baseUrl": "https://sboxlist.com/api",
+      "serverId": "REPLACE-WITH-THE-SERVER-ID-THE-SITE-SHOWS",
+      "token": "sbs_REPLACE-WITH-THE-SERVER-SECRET-THE-SITE-SHOWS",
+      "auth": "hmac",
+      "rewards": true
+    }
+  ],
+  "debug": false
+}

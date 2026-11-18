@@ -1,0 +1,11 @@
+{
+  "Title": "sboxlist",
+  "Type": "library",
+  "Org": "prioxystudios",
+  "Ident": "sboxlist",
+  "Schema": 1,
+  "IncludeSourceFiles": true,
+  "PackageReferences": [],
+  "EditorReferences": null,
+  "Resources": "Assets/*"
+}

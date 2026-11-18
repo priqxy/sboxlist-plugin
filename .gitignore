@@ -1,0 +1,16 @@
+.sbox/
+.vscode/
+.vs/
+**/Properties/
+**/bin/
+**/obj/
+*.csproj
+*.sln
+*.slnx
+sboxlist/Libraries/
+sboxlist/Localization/
+sboxlist/ProjectSettings/
+sboxlist.json
+.env*
+._*
+.DS_Store
